@@ -1,3 +1,99 @@
+///Datagram socket///
+import java.net.*;
+
+public class UDPC {
+    public static void main(String[] args) {
+        DatagramSocket skt;
+        try {
+            // Create DatagramSocket
+            skt = new DatagramSocket();
+
+            // Message to send
+            String msg = "udp";
+            byte[] b = msg.getBytes();
+
+            // Server details
+            InetAddress host = InetAddress.getByName("127.0.0.1");
+            int serverSocket = 6788;
+
+            // Send the request packet
+            DatagramPacket request = new DatagramPacket(b, b.length, host, serverSocket);
+            skt.send(request);
+
+            // Prepare buffer to receive the reply
+            byte[] buffer = new byte[1000];
+            DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
+
+            // Receive the reply
+            skt.receive(reply);
+
+            // Print the received message
+            System.out.println("Client received: " + new String(reply.getData(), 0, reply.getLength()));
+
+            // Close the socket
+            skt.close();
+        } catch (Exception ex) {
+            // Silently handle exceptions
+        }
+    }
+}
+
+
+import java.net.*;
+
+public class UDPS {
+
+    public static void main(String[] args) {
+        DatagramSocket skt = null;
+
+        try {
+            // Create a DatagramSocket at port 6788
+            skt = new DatagramSocket(6788);
+
+            // Prepare a buffer to receive messages
+            byte[] buffer = new byte[1000];
+
+            // Server runs infinitely
+            while (true) {
+                // Receive the request
+                DatagramPacket request = new DatagramPacket(buffer, buffer.length);
+                skt.receive(request);
+
+                // Process the request
+                String message = new String(request.getData(), 0, request.getLength());
+                String[] messageParts = message.split(" ");
+                String responseMessage = messageParts[0] + " Network Laboratory";
+
+                // Prepare and send the response
+                byte[] sendMsg = responseMessage.getBytes();
+                DatagramPacket reply = new DatagramPacket(
+                        sendMsg, 
+                        sendMsg.length, 
+                        request.getAddress(), 
+                        request.getPort()
+                );
+                skt.send(reply);
+
+                // Print the response
+                System.out.println("Server sent: " + responseMessage);
+            }
+
+        } catch (Exception ex) {
+            // Handle exceptions silently
+        } finally {
+            if (skt != null && !skt.isClosed()) {
+                skt.close();
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
 ///*Bellman Ford*///
 import java.util.Scanner; 
 public class BellmanFord 
